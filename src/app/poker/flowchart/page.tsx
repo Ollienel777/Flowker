@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 
@@ -585,12 +585,75 @@ const NAV_LINKS = [
   { href: '#glossary',  label: 'Glossary' },
 ];
 
+// ─── Right sidebar nav ────────────────────────────────────────────────────────
+
+function SideNav({ activeId }: { activeId: string }) {
+  const activeIndex = NAV_LINKS.findIndex(l => l.href.slice(1) === activeId);
+
+  return (
+    <nav className="hidden lg:flex flex-col fixed right-6 top-1/2 -translate-y-1/2 z-40 items-end">
+      {NAV_LINKS.map(({ href, label }, i) => {
+        const isActive = i === activeIndex;
+        const isAdjacent = Math.abs(i - activeIndex) === 1;
+        const gap = isActive
+          ? 'mt-5 mb-5'
+          : isAdjacent
+          ? 'mt-2 mb-2'
+          : 'mt-1 mb-1';
+
+        return (
+          <a
+            key={href}
+            href={href}
+            className={[
+              'group flex items-center gap-2 justify-end transition-all duration-300',
+              gap,
+              isActive ? '' : 'opacity-25 hover:opacity-60',
+            ].join(' ')}
+          >
+            <span
+              className={[
+                'whitespace-nowrap transition-all duration-300',
+                isActive
+                  ? 'text-sm text-white font-semibold'
+                  : 'text-xs text-slate-400 group-hover:text-slate-200',
+              ].join(' ')}
+            >
+              — {label}
+            </span>
+          </a>
+        );
+      })}
+    </nav>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ThreeBetFlowchartPage() {
+  const [activeId, setActiveId] = useState('oop-flop');
+
+  useEffect(() => {
+    const ids = NAV_LINKS.map(l => l.href.slice(1));
+    const observers: IntersectionObserver[] = [];
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveId(id); },
+        { rootMargin: '-30% 0px -60% 0px', threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach(o => o.disconnect());
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Top nav */}
+      {/* Top header — no nav links, those moved to right sidebar */}
       <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur border-b border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
           <Link href="/poker" className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-sm shrink-0">
@@ -599,19 +662,10 @@ export default function ThreeBetFlowchartPage() {
           </Link>
           <div className="w-px h-4 bg-slate-700 shrink-0" />
           <div className="text-white font-semibold text-sm shrink-0">3-Bet Pots</div>
-          <nav className="hidden md:flex items-center gap-1 overflow-x-auto ml-2">
-            {NAV_LINKS.map(({ href, label }) => (
-              <a
-                key={href}
-                href={href}
-                className="px-3 py-1 text-xs text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition-colors whitespace-nowrap"
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
         </div>
       </header>
+
+      <SideNav activeId={activeId} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
         {/* Page title */}
