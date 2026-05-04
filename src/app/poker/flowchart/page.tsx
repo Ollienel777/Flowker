@@ -603,7 +603,7 @@ function LeftSidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
       {/* Panel */}
       <aside
         className={[
-          'fixed left-0 top-14 h-[calc(100vh-3.5rem)] z-30',
+          'fixed left-0 top-0 h-screen z-30',
           'w-72 bg-slate-900/95 backdrop-blur border-r border-slate-800',
           'overflow-y-auto transition-transform duration-300',
           open ? 'translate-x-0' : '-translate-x-full',
@@ -745,18 +745,6 @@ export default function ThreeBetFlowchartPage() {
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Top header — no nav links, those moved to right sidebar */}
-      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur border-b border-slate-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
-          <Link href="/poker" className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-sm shrink-0">
-            <ChevronLeft className="w-4 h-4" />
-            Strategy
-          </Link>
-          <div className="w-px h-4 bg-slate-700 shrink-0" />
-          <div className="text-white font-semibold text-sm shrink-0">3-Bet Pots</div>
-        </div>
-      </header>
-
       <LeftSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
       <SideNav activeId={activeId} />
 
@@ -764,6 +752,17 @@ export default function ThreeBetFlowchartPage() {
         'px-4 sm:px-6 py-10 transition-all duration-300',
         sidebarOpen ? 'ml-72' : 'ml-0',
       ].join(' ')}>
+
+        {/* Back button — inline, disappears on scroll */}
+        <div className="mb-8">
+          <Link
+            href="/poker"
+            className="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-sm"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Strategy
+          </Link>
+        </div>
 
         {/* OOP Section */}
         <div className="mb-12">
