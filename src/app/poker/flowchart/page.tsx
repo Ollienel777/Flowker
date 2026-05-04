@@ -597,7 +597,6 @@ const LEGEND = [
 
 function LeftSidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
   const [glossaryOpen, setGlossaryOpen] = useState(false);
-
   return (
     <>
       {/* Panel */}

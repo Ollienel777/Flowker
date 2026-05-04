@@ -2187,7 +2187,7 @@ function LeftSidebar({ open, setOpen }) {
                                     children: "3-Bet Pot Navigation"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                    lineNumber: 615,
+                                    lineNumber: 614,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2200,20 +2200,20 @@ function LeftSidebar({ open, setOpen }) {
                                             children: "Why?"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                            lineNumber: 618,
+                                            lineNumber: 617,
                                             columnNumber: 15
                                         }, this),
                                         " on any node to see the reasoning behind the recommendation."
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                    lineNumber: 616,
+                                    lineNumber: 615,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                            lineNumber: 614,
+                            lineNumber: 613,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2223,7 +2223,7 @@ function LeftSidebar({ open, setOpen }) {
                                     children: "Color Legend"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                    lineNumber: 624,
+                                    lineNumber: 623,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2235,25 +2235,25 @@ function LeftSidebar({ open, setOpen }) {
                                                     className: `w-3 h-3 rounded-full shrink-0 ${color}`
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                                    lineNumber: 628,
+                                                    lineNumber: 627,
                                                     columnNumber: 19
                                                 }, this),
                                                 label
                                             ]
                                         }, label, true, {
                                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                            lineNumber: 627,
+                                            lineNumber: 626,
                                             columnNumber: 17
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                    lineNumber: 625,
+                                    lineNumber: 624,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                            lineNumber: 623,
+                            lineNumber: 622,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2266,20 +2266,20 @@ function LeftSidebar({ open, setOpen }) {
                                             className: "w-4 h-4 text-slate-400"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                            lineNumber: 642,
+                                            lineNumber: 641,
                                             columnNumber: 19
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                             className: "w-4 h-4 text-slate-400"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                            lineNumber: 643,
+                                            lineNumber: 642,
                                             columnNumber: 19
                                         }, this),
                                         "Key Terms"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                    lineNumber: 637,
+                                    lineNumber: 636,
                                     columnNumber: 13
                                 }, this),
                                 glossaryOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2292,7 +2292,7 @@ function LeftSidebar({ open, setOpen }) {
                                                     children: term
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                                    lineNumber: 650,
+                                                    lineNumber: 649,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2300,35 +2300,35 @@ function LeftSidebar({ open, setOpen }) {
                                                     children: def
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                                    lineNumber: 651,
+                                                    lineNumber: 650,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, term, true, {
                                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                            lineNumber: 649,
+                                            lineNumber: 648,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                    lineNumber: 647,
+                                    lineNumber: 646,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                            lineNumber: 636,
+                            lineNumber: 635,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                    lineNumber: 612,
+                    lineNumber: 611,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                lineNumber: 604,
+                lineNumber: 603,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2344,18 +2344,18 @@ function LeftSidebar({ open, setOpen }) {
                     className: "w-4 h-4"
                 }, void 0, false, {
                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                    lineNumber: 672,
+                    lineNumber: 671,
                     columnNumber: 13
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                     className: "w-4 h-4"
                 }, void 0, false, {
                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                    lineNumber: 673,
+                    lineNumber: 672,
                     columnNumber: 13
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                lineNumber: 661,
+                lineNumber: 660,
                 columnNumber: 7
             }, this)
         ]
@@ -2388,18 +2388,18 @@ function SideNav({ activeId }) {
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                    lineNumber: 705,
+                    lineNumber: 704,
                     columnNumber: 13
                 }, this)
             }, href, false, {
                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                lineNumber: 696,
+                lineNumber: 695,
                 columnNumber: 11
             }, this);
         })
     }, void 0, false, {
         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-        lineNumber: 685,
+        lineNumber: 684,
         columnNumber: 5
     }, this);
 }
@@ -2431,14 +2431,14 @@ function ThreeBetFlowchartPage() {
                 setOpen: setSidebarOpen
             }, void 0, false, {
                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                lineNumber: 748,
+                lineNumber: 747,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SideNav, {
                 activeId: activeId
             }, void 0, false, {
                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                lineNumber: 749,
+                lineNumber: 748,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -2457,19 +2457,19 @@ function ThreeBetFlowchartPage() {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                    lineNumber: 762,
+                                    lineNumber: 761,
                                     columnNumber: 13
                                 }, this),
                                 "Strategy"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                            lineNumber: 758,
+                            lineNumber: 757,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                        lineNumber: 757,
+                        lineNumber: 756,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2482,7 +2482,7 @@ function ThreeBetFlowchartPage() {
                                         className: "h-px flex-1 bg-slate-800"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                        lineNumber: 770,
+                                        lineNumber: 769,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2490,41 +2490,41 @@ function ThreeBetFlowchartPage() {
                                         children: "Out of Position"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                        lineNumber: 771,
+                                        lineNumber: 770,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "h-px flex-1 bg-slate-800"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                        lineNumber: 774,
+                                        lineNumber: 773,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 769,
+                                lineNumber: 768,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(OopFlop, {}, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 776,
+                                lineNumber: 775,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(OopFacingStab, {}, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 777,
+                                lineNumber: 776,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(OopTurn, {}, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 778,
+                                lineNumber: 777,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                        lineNumber: 768,
+                        lineNumber: 767,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2537,7 +2537,7 @@ function ThreeBetFlowchartPage() {
                                         className: "h-px flex-1 bg-slate-800"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                        lineNumber: 784,
+                                        lineNumber: 783,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2545,41 +2545,41 @@ function ThreeBetFlowchartPage() {
                                         children: "In Position"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                        lineNumber: 785,
+                                        lineNumber: 784,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "h-px flex-1 bg-slate-800"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                        lineNumber: 788,
+                                        lineNumber: 787,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 783,
+                                lineNumber: 782,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(IpFlop, {}, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 790,
+                                lineNumber: 789,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(IpTurn, {}, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 791,
+                                lineNumber: 790,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(IpRiver, {}, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 792,
+                                lineNumber: 791,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                        lineNumber: 782,
+                        lineNumber: 781,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -2590,7 +2590,7 @@ function ThreeBetFlowchartPage() {
                                 children: "Biggest Takeaways"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 797,
+                                lineNumber: 796,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2619,7 +2619,7 @@ function ThreeBetFlowchartPage() {
                                                 children: num
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                                lineNumber: 817,
+                                                lineNumber: 816,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2627,7 +2627,7 @@ function ThreeBetFlowchartPage() {
                                                 children: title
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                                lineNumber: 818,
+                                                lineNumber: 817,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2635,36 +2635,36 @@ function ThreeBetFlowchartPage() {
                                                 children: body
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                                lineNumber: 819,
+                                                lineNumber: 818,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, num, true, {
                                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                        lineNumber: 816,
+                                        lineNumber: 815,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                                lineNumber: 798,
+                                lineNumber: 797,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                        lineNumber: 796,
+                        lineNumber: 795,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/poker/flowchart/page.tsx",
-                lineNumber: 751,
+                lineNumber: 750,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/poker/flowchart/page.tsx",
-        lineNumber: 747,
+        lineNumber: 746,
         columnNumber: 5
     }, this);
 }
