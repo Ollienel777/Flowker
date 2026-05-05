@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext, createContext } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 
@@ -33,12 +33,24 @@ const ACTION_STYLE: Record<string, string> = {
   'C-Bet Small': 'bg-emerald-700 text-white',
 };
 
+// ─── Filter context ───────────────────────────────────────────────────────────
+
+type Filters = {
+  position: 'oop' | 'ip' | null;
+  board: 'wet' | 'dry' | null;
+  handType: string | null;
+};
+
+const FilterContext = createContext<Filters>({ position: null, board: null, handType: null });
+
 // ─── Shared components ────────────────────────────────────────────────────────
 
 function HandBadge({ label }: { label: string }) {
+  const { handType } = useContext(FilterContext);
   const style = HAND_STYLE[label] ?? 'bg-slate-700 text-slate-300 border border-slate-600';
+  const dimmed = handType !== null && handType !== label;
   return (
-    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${style}`}>
+    <span className={`text-xs px-2 py-0.5 rounded-full font-medium transition-opacity duration-200 ${style} ${dimmed ? 'opacity-20' : ''}`}>
       {label}
     </span>
   );
@@ -151,6 +163,7 @@ function SectionCard({ id, title, subtitle, children }: { id: string; title: str
 // ─── OOP sections ─────────────────────────────────────────────────────────────
 
 function OopFlop() {
+  const { board } = useContext(FilterContext);
   return (
     <SectionCard id="oop-flop" title="OOP Flop" subtitle="You 3-bet pre. Villain calls. You're first to act.">
       <DecisionHeader
@@ -164,8 +177,8 @@ function OopFlop() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* YES branch */}
-        <div className="border-l-2 border-emerald-700/50 pl-4">
+        {/* YES branch — wet board */}
+        <div className={`border-l-2 border-emerald-700/50 pl-4 transition-opacity duration-300 ${board === 'dry' ? 'opacity-20' : ''}`}>
           <BranchLabel label="YES — Check-heavy spot" color="green" />
           <ResultBox
             rows={[{ action: 'Check', hands: ['All hands'] }]}
@@ -181,8 +194,8 @@ function OopFlop() {
           </WhySection>
         </div>
 
-        {/* NO branch */}
-        <div className="border-l-2 border-slate-600 pl-4">
+        {/* NO branch — dry board */}
+        <div className={`border-l-2 border-slate-600 pl-4 transition-opacity duration-300 ${board === 'wet' ? 'opacity-20' : ''}`}>
           <BranchLabel label="NO — Static/dry board" color="teal" />
           <DecisionHeader question="Is SPR > 15?" />
 
@@ -573,16 +586,271 @@ function Glossary() {
   );
 }
 
+// ─── Poker table view ─────────────────────────────────────────────────────────
+
+const HAND_TYPES = ['Thick Value', 'Thin Value', 'Showdown Value', 'Combo Draw', 'Draw', 'Air'];
+
+type Card = { rank: string; suit: '♥' | '♦' | '♣' | '♠' };
+
+const SUIT_BG: Record<string, string> = {
+  '♥': '#b91c1c',
+  '♦': '#1d4ed8',
+  '♣': '#374151',
+  '♠': '#111827',
+};
+
+const EXAMPLE_FLOPS: Record<'wet' | 'dry', Card[]> = {
+  wet: [
+    { rank: 'J', suit: '♥' },
+    { rank: 'T', suit: '♥' },
+    { rank: '9', suit: '♠' },
+  ],
+  dry: [
+    { rank: 'A', suit: '♦' },
+    { rank: '7', suit: '♣' },
+    { rank: '2', suit: '♠' },
+  ],
+};
+
+function GtoCard({ rank, suit, faceDown = false, small = false }: {
+  rank?: string; suit?: string; faceDown?: boolean; small?: boolean;
+}) {
+  const w = small ? 32 : 42;
+  const h = small ? 44 : 56;
+  const fontSize = small ? 14 : 20;
+
+  if (faceDown) {
+    return (
+      <div style={{
+        width: w, height: h,
+        borderRadius: 5,
+        background: 'linear-gradient(135deg, #1e3a5f 0%, #1e3a8a 100%)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.5)',
+      }} />
+    );
+  }
+
+  const bg = suit ? SUIT_BG[suit] ?? '#374151' : '#374151';
+  return (
+    <div style={{
+      width: w, height: h,
+      borderRadius: 5,
+      background: bg,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <span style={{ color: '#fff', fontWeight: 900, fontSize, lineHeight: 1 }}>{rank}</span>
+    </div>
+  );
+}
+
+function SeatBadge({ label, stack, active, color }: {
+  label: string; stack: number; active?: boolean; color?: 'teal' | 'orange';
+}) {
+  const borderColor = active
+    ? color === 'orange' ? '#f97316' : '#14b8a6'
+    : 'rgba(255,255,255,0.12)';
+  const bg = active
+    ? color === 'orange' ? 'rgba(249,115,22,0.15)' : 'rgba(20,184,166,0.15)'
+    : 'rgba(255,255,255,0.04)';
+
+  return (
+    <div style={{
+      width: 52, height: 52,
+      borderRadius: '50%',
+      border: `2px solid ${borderColor}`,
+      background: bg,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      boxShadow: active ? `0 0 12px ${borderColor}60` : 'none',
+    }}>
+      <span style={{ color: '#fff', fontWeight: 700, fontSize: 11, lineHeight: 1 }}>{label}</span>
+      <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, lineHeight: 1.4 }}>{stack}</span>
+    </div>
+  );
+}
+
+function TableView({ filters, setFilters }: {
+  filters: Filters;
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+}) {
+  const flop = filters.board ? EXAMPLE_FLOPS[filters.board] : null;
+
+  // heads-up: BTN = IP (acts last postflop), BB = OOP
+  const heroLabel    = filters.position === 'ip' ? 'BTN' : filters.position === 'oop' ? 'BB' : 'Hero';
+  const villainLabel = filters.position === 'ip' ? 'BB'  : filters.position === 'oop' ? 'BTN' : 'Villain';
+
+  function toggle<K extends keyof Filters>(key: K, value: Filters[K]) {
+    setFilters(f => {
+      const next = { ...f, [key]: f[key] === value ? null : value };
+      if (key === 'position') next.board = null;
+      if (key === 'position' || key === 'board') next.handType = null;
+      return next;
+    });
+  }
+
+  return (
+    <div className="rounded-xl border border-white/5 mb-10" style={{ background: '#0a0f1a' }}>
+
+      {/* ── Table ── */}
+      <div className="relative mx-auto" style={{ width: 520, height: 300, maxWidth: '100%' }}>
+
+        {/* Oval outline */}
+        <div className="absolute inset-8" style={{
+          borderRadius: '50%',
+          border: '1.5px solid rgba(255,255,255,0.1)',
+          background: 'rgba(255,255,255,0.015)',
+        }} />
+
+        {/* Villain row */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
+          <SeatBadge label={villainLabel} stack={50} color="orange" />
+          <div className="flex gap-1.5">
+            <GtoCard faceDown />
+            <GtoCard faceDown />
+          </div>
+        </div>
+
+        {/* Pot + flop */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-10">
+          <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 600 }}>9.2 bb</span>
+          <div className="flex gap-2">
+            {flop ? flop.map((c, i) => (
+              <GtoCard key={i} rank={c.rank} suit={c.suit} />
+            )) : (
+              [0,1,2].map(i => (
+                <div key={i} style={{
+                  width: 42, height: 56, borderRadius: 5,
+                  border: '1.5px dashed rgba(255,255,255,0.1)',
+                }} />
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Dealer button */}
+        <div className="absolute z-10" style={{
+          bottom: '32%', right: '28%',
+          width: 24, height: 24, borderRadius: '50%',
+          background: '#fff', border: '2px solid #64748b',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.5)',
+        }}>
+          <span style={{ fontSize: 9, fontWeight: 900, color: '#0f172a' }}>D</span>
+        </div>
+
+        {/* Hero row */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
+          <div className="flex gap-1.5">
+            <GtoCard faceDown />
+            <GtoCard faceDown />
+          </div>
+          <SeatBadge
+            label={heroLabel}
+            stack={50}
+            active={!!filters.position}
+            color="teal"
+          />
+        </div>
+      </div>
+
+      {/* ── Filter controls ── */}
+      <div className="flex flex-col gap-4 border-t px-6 py-5" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-slate-500 w-24 shrink-0">Position</span>
+          <div className="flex gap-2">
+            {(['oop', 'ip'] as const).map(pos => (
+              <button
+                key={pos}
+                onClick={() => toggle('position', pos)}
+                className="px-4 py-1.5 rounded-lg text-sm font-bold uppercase tracking-wide transition-all duration-200"
+                style={filters.position === pos ? {
+                  background: pos === 'oop' ? '#7f1d1d' : '#1e3a5f',
+                  color: pos === 'oop' ? '#fca5a5' : '#93c5fd',
+                  border: `1px solid ${pos === 'oop' ? '#dc2626' : '#2563eb'}`,
+                } : {
+                  background: 'rgba(255,255,255,0.04)',
+                  color: '#64748b',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                {pos.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {filters.position && (
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-slate-500 w-24 shrink-0">Board</span>
+            <div className="flex gap-2">
+              {([
+                { value: 'wet' as const, label: 'Wet / Dynamic' },
+                { value: 'dry' as const, label: 'Dry / Static'  },
+              ]).map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => toggle('board', value)}
+                  className="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                  style={filters.board === value ? {
+                    background: '#fff', color: '#0f172a', fontWeight: 700, border: '1px solid #fff',
+                  } : {
+                    background: 'rgba(255,255,255,0.04)', color: '#64748b', border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {filters.board && (
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-slate-500 w-24 shrink-0">Hand Type</span>
+            <div className="flex flex-wrap gap-2">
+              {HAND_TYPES.map(h => (
+                <button
+                  key={h}
+                  onClick={() => toggle('handType', h)}
+                  className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-200"
+                  style={filters.handType === h ? {
+                    background: '#fff', color: '#0f172a', fontWeight: 700, border: '1px solid #fff',
+                  } : {
+                    background: 'rgba(255,255,255,0.04)', color: '#64748b', border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  {h}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
-const NAV_LINKS = [
-  { href: '#oop-flop',  label: 'OOP Flop' },
-  { href: '#oop-stab',  label: 'OOP vs Stab' },
-  { href: '#oop-turn',  label: 'OOP Turn' },
-  { href: '#ip-flop',   label: 'IP Flop' },
-  { href: '#ip-turn',   label: 'IP Turn' },
-  { href: '#ip-river',  label: 'IP River' },
+const OOP_LINKS = [
+  { href: '#oop-flop', label: 'OOP Flop' },
+  { href: '#oop-stab', label: 'OOP vs Stab' },
+  { href: '#oop-turn', label: 'OOP Turn' },
 ];
+
+const IP_LINKS = [
+  { href: '#ip-flop',  label: 'IP Flop' },
+  { href: '#ip-turn',  label: 'IP Turn' },
+  { href: '#ip-river', label: 'IP River' },
+];
+
+const NAV_LINKS = [...OOP_LINKS, ...IP_LINKS];
 
 // ─── Left sidebar ─────────────────────────────────────────────────────────────
 
@@ -678,11 +946,12 @@ function LeftSidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
 // ─── Right sidebar nav ────────────────────────────────────────────────────────
 
 function SideNav({ activeId }: { activeId: string }) {
-  const activeIndex = NAV_LINKS.findIndex(l => l.href.slice(1) === activeId);
+  const links = NAV_LINKS;
+  const activeIndex = links.findIndex(l => l.href.slice(1) === activeId);
 
   return (
     <nav className="hidden lg:flex flex-col fixed right-6 top-1/2 -translate-y-1/2 z-40 items-end">
-      {NAV_LINKS.map(({ href, label }, i) => {
+      {links.map(({ href, label }, i) => {
         const isActive = i === activeIndex;
         const isAdjacent = Math.abs(i - activeIndex) === 1;
         const gap = isActive
@@ -723,11 +992,11 @@ function SideNav({ activeId }: { activeId: string }) {
 export default function ThreeBetFlowchartPage() {
   const [activeId, setActiveId] = useState('oop-flop');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [filters, setFilters] = useState<Filters>({ position: null, board: null, handType: null });
 
   useEffect(() => {
     const ids = NAV_LINKS.map(l => l.href.slice(1));
     const observers: IntersectionObserver[] = [];
-
     ids.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -738,11 +1007,14 @@ export default function ThreeBetFlowchartPage() {
       obs.observe(el);
       observers.push(obs);
     });
-
     return () => observers.forEach(o => o.disconnect());
   }, []);
 
+  const oopDim = filters.position === 'ip';
+  const ipDim  = filters.position === 'oop';
+
   return (
+    <FilterContext.Provider value={filters}>
     <div className="min-h-screen bg-slate-950">
       <LeftSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
       <SideNav activeId={activeId} />
@@ -752,19 +1024,19 @@ export default function ThreeBetFlowchartPage() {
         sidebarOpen ? 'ml-72' : 'ml-0',
       ].join(' ')}>
 
-        {/* Back button — inline, disappears on scroll */}
+        {/* Back button */}
         <div className="mb-8">
-          <Link
-            href="/poker"
-            className="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-sm"
-          >
+          <Link href="/poker" className="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-sm">
             <ChevronLeft className="w-4 h-4" />
             Strategy
           </Link>
         </div>
 
-        {/* OOP Section */}
-        <div className="mb-12">
+        {/* Table view */}
+        <TableView filters={filters} setFilters={setFilters} />
+
+        {/* OOP sections */}
+        <div className={`transition-opacity duration-300 mb-12 ${oopDim ? 'opacity-20 pointer-events-none' : ''}`}>
           <div className="flex items-center gap-3 mb-8">
             <div className="h-px flex-1 bg-slate-800" />
             <div className="px-4 py-1.5 bg-slate-900 border border-slate-700 rounded-full text-sm font-bold text-slate-300 uppercase tracking-widest">
@@ -777,8 +1049,8 @@ export default function ThreeBetFlowchartPage() {
           <OopTurn />
         </div>
 
-        {/* IP Section */}
-        <div className="mb-12">
+        {/* IP sections */}
+        <div className={`transition-opacity duration-300 mb-12 ${ipDim ? 'opacity-20 pointer-events-none' : ''}`}>
           <div className="flex items-center gap-3 mb-8">
             <div className="h-px flex-1 bg-slate-800" />
             <div className="px-4 py-1.5 bg-slate-900 border border-slate-700 rounded-full text-sm font-bold text-slate-300 uppercase tracking-widest">
@@ -791,36 +1063,8 @@ export default function ThreeBetFlowchartPage() {
           <IpRiver />
         </div>
 
-        {/* Key takeaways */}
-        <section className="mb-12">
-          <h3 className="text-lg font-bold text-white mb-4">Biggest Takeaways</h3>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              {
-                num: '01',
-                title: 'Check more OOP',
-                body: 'On wet/dynamic boards, checking your entire range lets villain make mistakes — they over-stab, reveal info through sizing, and fail to protect their check-back range.',
-              },
-              {
-                num: '02',
-                title: 'C-bet small IP',
-                body: 'In 3-bet pots the pot is already large. A small c-bet keeps weak hands in, induces raises from strong hands, and costs little if you\'re behind.',
-              },
-              {
-                num: '03',
-                title: 'Think about villain\'s range',
-                body: 'On turns and rivers, stop thinking only about your hand. Ask: Is villain capped? Will they fast-play? Do they have inelastic calling hands? That\'s what determines sizing.',
-              },
-            ].map(({ num, title, body }) => (
-              <div key={num} className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                <div className="text-3xl font-black text-slate-700 mb-2">{num}</div>
-                <div className="text-white font-semibold mb-2">{title}</div>
-                <div className="text-slate-400 text-sm leading-relaxed">{body}</div>
-              </div>
-            ))}
-          </div>
-        </section>
       </main>
     </div>
+    </FilterContext.Provider>
   );
 }
