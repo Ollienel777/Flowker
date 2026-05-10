@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext, createContext } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 
@@ -33,12 +33,24 @@ const ACTION_STYLE: Record<string, string> = {
   'C-Bet Small': 'bg-emerald-700 text-white',
 };
 
+// ─── Filter context ───────────────────────────────────────────────────────────
+
+type Filters = {
+  position: 'oop' | 'ip' | null;
+  board: 'wet' | 'dry' | null;
+  handType: string | null;
+};
+
+const FilterContext = createContext<Filters>({ position: null, board: null, handType: null });
+
 // ─── Shared components ────────────────────────────────────────────────────────
 
 function HandBadge({ label }: { label: string }) {
+  const { handType } = useContext(FilterContext);
   const style = HAND_STYLE[label] ?? 'bg-slate-700 text-slate-300 border border-slate-600';
+  const dimmed = handType !== null && handType !== label;
   return (
-    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${style}`}>
+    <span className={`text-xs px-2 py-0.5 rounded-full font-medium transition-opacity duration-200 ${style} ${dimmed ? 'opacity-20' : ''}`}>
       {label}
     </span>
   );
@@ -151,6 +163,7 @@ function SectionCard({ id, title, subtitle, children }: { id: string; title: str
 // ─── OOP sections ─────────────────────────────────────────────────────────────
 
 function OopFlop() {
+  const { board } = useContext(FilterContext);
   return (
     <SectionCard id="oop-flop" title="OOP Flop" subtitle="You 3-bet pre. Villain calls. You're first to act.">
       <DecisionHeader
@@ -164,8 +177,8 @@ function OopFlop() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* YES branch */}
-        <div className="border-l-2 border-emerald-700/50 pl-4">
+        {/* YES branch — wet board */}
+        <div className={`border-l-2 border-emerald-700/50 pl-4 transition-opacity duration-300 ${board === 'dry' ? 'opacity-20' : ''}`}>
           <BranchLabel label="YES — Check-heavy spot" color="green" />
           <ResultBox
             rows={[{ action: 'Check', hands: ['All hands'] }]}
@@ -181,8 +194,8 @@ function OopFlop() {
           </WhySection>
         </div>
 
-        {/* NO branch */}
-        <div className="border-l-2 border-slate-600 pl-4">
+        {/* NO branch — dry board */}
+        <div className={`border-l-2 border-slate-600 pl-4 transition-opacity duration-300 ${board === 'wet' ? 'opacity-20' : ''}`}>
           <BranchLabel label="NO — Static/dry board" color="teal" />
           <DecisionHeader question="Is SPR > 15?" />
 
@@ -573,26 +586,392 @@ function Glossary() {
   );
 }
 
+// ─── Poker table view ─────────────────────────────────────────────────────────
+
+const HAND_TYPES = ['Thick Value', 'Thin Value', 'Showdown Value', 'Combo Draw', 'Draw', 'Air'];
+
+type Card = { rank: string; suit: '♥' | '♦' | '♣' | '♠' };
+
+const SUIT_BG: Record<string, string> = {
+  '♥': '#b91c1c',
+  '♦': '#1d4ed8',
+  '♣': '#374151',
+  '♠': '#111827',
+};
+
+const EXAMPLE_FLOPS: Record<'wet' | 'dry', Card[]> = {
+  wet: [
+    { rank: 'J', suit: '♥' },
+    { rank: 'T', suit: '♥' },
+    { rank: '9', suit: '♠' },
+  ],
+  dry: [
+    { rank: 'A', suit: '♦' },
+    { rank: '7', suit: '♣' },
+    { rank: '2', suit: '♠' },
+  ],
+};
+
+// Clockwise angle from 12 o'clock → (x, y) on the oval
+// Container: 520 × 304, center (260, 152), ra=185, rb=114
+function seatPos(angleDeg: number) {
+  const rad = angleDeg * Math.PI / 180;
+  return { x: 260 + 185 * Math.sin(rad), y: 152 - 114 * Math.cos(rad) };
+}
+
+const GHOST_SEATS: { label: string; angle: number }[] = [
+  { label: 'UTG1', angle: 60  },
+  { label: 'CO',   angle: 120 },
+  { label: 'SB',   angle: 240 },
+  { label: 'UTG',  angle: 300 },
+];
+
+function GtoCard({ rank, suit, faceDown = false }: {
+  rank?: string; suit?: string; faceDown?: boolean;
+}) {
+  if (faceDown) {
+    return (
+      <div style={{
+        width: 38, height: 52, borderRadius: 5, flexShrink: 0,
+        background: 'linear-gradient(135deg, #1e3a5f, #1e3a8a)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.5)',
+      }} />
+    );
+  }
+  const bg = suit ? SUIT_BG[suit] ?? '#374151' : '#374151';
+  return (
+    <div style={{
+      width: 38, height: 52, borderRadius: 5, flexShrink: 0,
+      background: bg, boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      <span style={{ color: '#fff', fontWeight: 900, fontSize: 19, lineHeight: 1 }}>{rank}</span>
+    </div>
+  );
+}
+
+function GhostSeat({ label }: { label: string }) {
+  return (
+    <div style={{
+      width: 48, height: 48, borderRadius: '50%',
+      border: '1.5px solid rgba(255,255,255,0.08)',
+      background: 'rgba(255,255,255,0.02)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      <span style={{ color: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 11 }}>{label}</span>
+    </div>
+  );
+}
+
+function ActiveSeat({ label, active, color }: {
+  label: string; active: boolean; color: 'teal' | 'orange';
+}) {
+  const accent = color === 'orange' ? '#f97316' : '#14b8a6';
+  return (
+    <div style={{
+      width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+      border: `2px solid ${active ? accent : 'rgba(255,255,255,0.14)'}`,
+      background: active ? `${accent}18` : 'rgba(255,255,255,0.04)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: active ? `0 0 14px ${accent}40` : 'none',
+    }}>
+      <span style={{ color: active ? '#fff' : 'rgba(255,255,255,0.35)', fontWeight: 700, fontSize: 12 }}>{label}</span>
+    </div>
+  );
+}
+
+function TableView({ filters, setFilters }: {
+  filters: Filters;
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+}) {
+  const flop = filters.board ? EXAMPLE_FLOPS[filters.board] : null;
+
+  // heads-up: BTN = IP (acts last postflop), BB = OOP
+  const heroLabel    = filters.position === 'ip' ? 'BTN' : filters.position === 'oop' ? 'BB'  : 'Hero';
+  const villainLabel = filters.position === 'ip' ? 'BB'  : filters.position === 'oop' ? 'BTN' : 'Villain';
+
+  function toggle<K extends keyof Filters>(key: K, value: Filters[K]) {
+    setFilters(f => {
+      const next = { ...f, [key]: f[key] === value ? null : value };
+      if (key === 'position') next.board = null;
+      if (key === 'position' || key === 'board') next.handType = null;
+      return next;
+    });
+  }
+
+  return (
+    <div className="rounded-xl border border-white/5 mb-10 overflow-hidden" style={{ background: '#080d15' }}>
+
+      {/* ── Table ── */}
+      <div className="relative mx-auto" style={{ width: 520, height: 304, maxWidth: '100%' }}>
+
+        {/* Oval */}
+        <div className="absolute" style={{
+          inset: '38px 75px',
+          borderRadius: '50%',
+          border: '1.5px solid rgba(255,255,255,0.07)',
+          background: 'rgba(255,255,255,0.01)',
+        }} />
+
+        {/* Ghost seats */}
+        {GHOST_SEATS.map(({ label, angle }) => {
+          const { x, y } = seatPos(angle);
+          return (
+            <div key={label} style={{ position: 'absolute', left: x - 24, top: y - 24, zIndex: 10 }}>
+              <GhostSeat label={label} />
+            </div>
+          );
+        })}
+
+        {/* Villain (top) */}
+        <div style={{
+          position: 'absolute', top: 12, left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex', alignItems: 'center', gap: 6, zIndex: 10,
+        }}>
+          <ActiveSeat label={villainLabel} active={!!filters.position} color="orange" />
+          <GtoCard faceDown />
+          <GtoCard faceDown />
+        </div>
+
+        {/* Pot + flop */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, zIndex: 10,
+        }}>
+          <span style={{ color: 'rgba(255,255,255,0.28)', fontSize: 11, fontWeight: 600 }}>9.2 bb</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {flop ? flop.map((c, i) => (
+              <GtoCard key={i} rank={c.rank} suit={c.suit} />
+            )) : (
+              [0,1,2].map(i => (
+                <div key={i} style={{ width: 38, height: 52, borderRadius: 5, border: '1.5px dashed rgba(255,255,255,0.07)' }} />
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Dealer button — right edge of oval */}
+        <div style={{
+          position: 'absolute', top: '50%', right: 78,
+          transform: 'translateY(-50%)',
+          width: 22, height: 22, borderRadius: '50%',
+          background: '#fff', border: '2px solid #475569',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.5)', zIndex: 10,
+        }}>
+          <span style={{ fontSize: 8, fontWeight: 900, color: '#0f172a' }}>D</span>
+        </div>
+
+        {/* Hero (bottom) */}
+        <div style={{
+          position: 'absolute', bottom: 12, left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex', alignItems: 'center', gap: 6, zIndex: 10,
+        }}>
+          <GtoCard faceDown />
+          <GtoCard faceDown />
+          <ActiveSeat label={heroLabel} active={!!filters.position} color="teal" />
+        </div>
+      </div>
+
+      {/* ── Filter controls ── */}
+      <div className="flex flex-col gap-4 border-t px-6 py-5" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-slate-500 w-24 shrink-0">Position</span>
+          <div className="flex gap-2">
+            {(['oop', 'ip'] as const).map(pos => (
+              <button
+                key={pos}
+                onClick={() => toggle('position', pos)}
+                className="px-4 py-1.5 rounded-lg text-sm font-bold uppercase tracking-wide transition-all duration-200"
+                style={filters.position === pos ? {
+                  background: pos === 'oop' ? '#7f1d1d' : '#1e3a5f',
+                  color: pos === 'oop' ? '#fca5a5' : '#93c5fd',
+                  border: `1px solid ${pos === 'oop' ? '#dc2626' : '#2563eb'}`,
+                } : {
+                  background: 'rgba(255,255,255,0.04)',
+                  color: '#64748b',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                {pos.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {filters.position && (
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-slate-500 w-24 shrink-0">Board</span>
+            <div className="flex gap-2">
+              {([
+                { value: 'wet' as const, label: 'Wet / Dynamic' },
+                { value: 'dry' as const, label: 'Dry / Static'  },
+              ]).map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => toggle('board', value)}
+                  className="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                  style={filters.board === value ? {
+                    background: '#fff', color: '#0f172a', fontWeight: 700, border: '1px solid #fff',
+                  } : {
+                    background: 'rgba(255,255,255,0.04)', color: '#64748b', border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {filters.board && (
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-slate-500 w-24 shrink-0">Hand Type</span>
+            <div className="flex flex-wrap gap-2">
+              {HAND_TYPES.map(h => (
+                <button
+                  key={h}
+                  onClick={() => toggle('handType', h)}
+                  className="px-3 py-1 rounded-full text-xs font-medium transition-all duration-200"
+                  style={filters.handType === h ? {
+                    background: '#fff', color: '#0f172a', fontWeight: 700, border: '1px solid #fff',
+                  } : {
+                    background: 'rgba(255,255,255,0.04)', color: '#64748b', border: '1px solid rgba(255,255,255,0.08)',
+                  }}
+                >
+                  {h}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
-const NAV_LINKS = [
-  { href: '#oop-flop',  label: 'OOP Flop' },
-  { href: '#oop-stab',  label: 'OOP vs Stab' },
-  { href: '#oop-turn',  label: 'OOP Turn' },
-  { href: '#ip-flop',   label: 'IP Flop' },
-  { href: '#ip-turn',   label: 'IP Turn' },
-  { href: '#ip-river',  label: 'IP River' },
-  { href: '#glossary',  label: 'Glossary' },
+const OOP_LINKS = [
+  { href: '#oop-flop', label: 'OOP Flop' },
+  { href: '#oop-stab', label: 'OOP vs Stab' },
+  { href: '#oop-turn', label: 'OOP Turn' },
 ];
+
+const IP_LINKS = [
+  { href: '#ip-flop',  label: 'IP Flop' },
+  { href: '#ip-turn',  label: 'IP Turn' },
+  { href: '#ip-river', label: 'IP River' },
+];
+
+const NAV_LINKS = [...OOP_LINKS, ...IP_LINKS];
+
+// ─── Left sidebar ─────────────────────────────────────────────────────────────
+
+const LEGEND = [
+  { color: 'bg-amber-700',   label: 'Decision' },
+  { color: 'bg-emerald-700', label: 'Bet / Lead' },
+  { color: 'bg-violet-700',  label: 'Check-Raise' },
+  { color: 'bg-blue-700',    label: 'Check-Call' },
+  { color: 'bg-red-700',     label: 'Check-Fold' },
+  { color: 'bg-slate-600',   label: 'Check' },
+];
+
+function LeftSidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
+  return (
+    <>
+      {/* Panel */}
+      <aside
+        className={[
+          'fixed left-0 top-0 h-screen z-30',
+          'w-72 bg-slate-900/95 backdrop-blur border-r border-slate-800',
+          'overflow-y-auto transition-transform duration-300',
+          open ? 'translate-x-0' : '-translate-x-full',
+        ].join(' ')}
+      >
+        <div className="p-6 space-y-6">
+          {/* Title + description */}
+          <div>
+            <h1 className="text-xl font-bold text-white mb-2">3-Bet Pot Navigation</h1>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Complete decision flowchart for post-flop play in 3-bet pots. Click{' '}
+              <span className="text-slate-300 font-medium">Why?</span> on any node to see the reasoning behind the recommendation.
+            </p>
+          </div>
+
+          {/* Legend */}
+          <div>
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Color Legend</div>
+            <div className="flex flex-col gap-2">
+              {LEGEND.map(({ color, label }) => (
+                <div key={label} className="flex items-center gap-2 text-sm text-slate-300">
+                  <span className={`w-3 h-3 rounded-full shrink-0 ${color}`} />
+                  {label}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Key Terms */}
+          <div>
+            <button
+              onClick={() => setGlossaryOpen(g => !g)}
+              className="flex items-center gap-2 text-sm font-bold text-white hover:text-slate-300 transition-colors w-full"
+            >
+              {glossaryOpen
+                ? <ChevronDown className="w-4 h-4 text-slate-400" />
+                : <ChevronRight className="w-4 h-4 text-slate-400" />}
+              Key Terms
+            </button>
+            {glossaryOpen && (
+              <div className="mt-3 flex flex-col gap-2">
+                {GLOSSARY_TERMS.map(({ term, def }) => (
+                  <div key={term} className="bg-slate-800 border border-slate-700/60 rounded-lg px-3 py-2.5">
+                    <div className="text-xs font-semibold text-white mb-0.5">{term}</div>
+                    <div className="text-xs text-slate-400 leading-relaxed">{def}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* Toggle tab — slides with the panel */}
+      <button
+        onClick={() => setOpen(!open)}
+        className={[
+          'fixed top-1/2 -translate-y-1/2 z-30 h-16 w-7',
+          'bg-slate-800 border border-slate-700 flex items-center justify-center',
+          'text-slate-400 hover:text-white transition-all duration-300',
+          open ? 'left-72 rounded-r-lg border-l-0' : 'left-0 rounded-r-lg',
+        ].join(' ')}
+        aria-label={open ? 'Collapse sidebar' : 'Expand sidebar'}
+      >
+        {open
+          ? <ChevronLeft className="w-4 h-4" />
+          : <ChevronRight className="w-4 h-4" />}
+      </button>
+    </>
+  );
+}
 
 // ─── Right sidebar nav ────────────────────────────────────────────────────────
 
 function SideNav({ activeId }: { activeId: string }) {
-  const activeIndex = NAV_LINKS.findIndex(l => l.href.slice(1) === activeId);
+  const links = NAV_LINKS;
+  const activeIndex = links.findIndex(l => l.href.slice(1) === activeId);
 
   return (
     <nav className="hidden lg:flex flex-col fixed right-6 top-1/2 -translate-y-1/2 z-40 items-end">
-      {NAV_LINKS.map(({ href, label }, i) => {
+      {links.map(({ href, label }, i) => {
         const isActive = i === activeIndex;
         const isAdjacent = Math.abs(i - activeIndex) === 1;
         const gap = isActive
@@ -632,11 +1011,12 @@ function SideNav({ activeId }: { activeId: string }) {
 
 export default function ThreeBetFlowchartPage() {
   const [activeId, setActiveId] = useState('oop-flop');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [filters, setFilters] = useState<Filters>({ position: null, board: null, handType: null });
 
   useEffect(() => {
     const ids = NAV_LINKS.map(l => l.href.slice(1));
     const observers: IntersectionObserver[] = [];
-
     ids.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -647,47 +1027,36 @@ export default function ThreeBetFlowchartPage() {
       obs.observe(el);
       observers.push(obs);
     });
-
     return () => observers.forEach(o => o.disconnect());
   }, []);
 
+  const oopDim = filters.position === 'ip';
+  const ipDim  = filters.position === 'oop';
+
   return (
+    <FilterContext.Provider value={filters}>
     <div className="min-h-screen bg-slate-950">
-      {/* Top header — no nav links, those moved to right sidebar */}
-      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur border-b border-slate-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
-          <Link href="/poker" className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-sm shrink-0">
+      <LeftSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+      <SideNav activeId={activeId} />
+
+      <main className={[
+        'px-4 sm:px-6 py-10 transition-all duration-300',
+        sidebarOpen ? 'ml-72' : 'ml-0',
+      ].join(' ')}>
+
+        {/* Back button */}
+        <div className="mb-8">
+          <Link href="/poker" className="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-sm">
             <ChevronLeft className="w-4 h-4" />
             Strategy
           </Link>
-          <div className="w-px h-4 bg-slate-700 shrink-0" />
-          <div className="text-white font-semibold text-sm shrink-0">3-Bet Pots</div>
-        </div>
-      </header>
-
-      <SideNav activeId={activeId} />
-
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        {/* Page title */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-white mb-2">3-Bet Pot Navigation</h1>
-          <p className="text-slate-400 max-w-2xl">
-            Complete decision flowchart for post-flop play in 3-bet pots. Click <span className="text-slate-300 font-medium">Why?</span> on any node to see the reasoning behind the recommendation.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs">
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-700 inline-block" /> Decision</div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-emerald-700 inline-block" /> Bet / Lead</div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-violet-700 inline-block" /> Check-Raise</div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-700 inline-block" /> Check-Call</div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-700 inline-block" /> Check-Fold</div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-slate-600 inline-block" /> Check</div>
-          </div>
         </div>
 
-        <Glossary />
+        {/* Table view */}
+        <TableView filters={filters} setFilters={setFilters} />
 
-        {/* OOP Section */}
-        <div className="mb-12">
+        {/* OOP sections */}
+        <div className={`transition-opacity duration-300 mb-12 ${oopDim ? 'opacity-20 pointer-events-none' : ''}`}>
           <div className="flex items-center gap-3 mb-8">
             <div className="h-px flex-1 bg-slate-800" />
             <div className="px-4 py-1.5 bg-slate-900 border border-slate-700 rounded-full text-sm font-bold text-slate-300 uppercase tracking-widest">
@@ -700,8 +1069,8 @@ export default function ThreeBetFlowchartPage() {
           <OopTurn />
         </div>
 
-        {/* IP Section */}
-        <div className="mb-12">
+        {/* IP sections */}
+        <div className={`transition-opacity duration-300 mb-12 ${ipDim ? 'opacity-20 pointer-events-none' : ''}`}>
           <div className="flex items-center gap-3 mb-8">
             <div className="h-px flex-1 bg-slate-800" />
             <div className="px-4 py-1.5 bg-slate-900 border border-slate-700 rounded-full text-sm font-bold text-slate-300 uppercase tracking-widest">
@@ -714,36 +1083,8 @@ export default function ThreeBetFlowchartPage() {
           <IpRiver />
         </div>
 
-        {/* Key takeaways */}
-        <section className="mb-12">
-          <h3 className="text-lg font-bold text-white mb-4">Biggest Takeaways</h3>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              {
-                num: '01',
-                title: 'Check more OOP',
-                body: 'On wet/dynamic boards, checking your entire range lets villain make mistakes — they over-stab, reveal info through sizing, and fail to protect their check-back range.',
-              },
-              {
-                num: '02',
-                title: 'C-bet small IP',
-                body: 'In 3-bet pots the pot is already large. A small c-bet keeps weak hands in, induces raises from strong hands, and costs little if you\'re behind.',
-              },
-              {
-                num: '03',
-                title: 'Think about villain\'s range',
-                body: 'On turns and rivers, stop thinking only about your hand. Ask: Is villain capped? Will they fast-play? Do they have inelastic calling hands? That\'s what determines sizing.',
-              },
-            ].map(({ num, title, body }) => (
-              <div key={num} className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                <div className="text-3xl font-black text-slate-700 mb-2">{num}</div>
-                <div className="text-white font-semibold mb-2">{title}</div>
-                <div className="text-slate-400 text-sm leading-relaxed">{body}</div>
-              </div>
-            ))}
-          </div>
-        </section>
       </main>
     </div>
+    </FilterContext.Provider>
   );
 }

@@ -10,4 +10,11 @@
     background-color: #020617; /* slate-950 */
     color: #f1f5f9; /* slate-100 */
   }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 }
