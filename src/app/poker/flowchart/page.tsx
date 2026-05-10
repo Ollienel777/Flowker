@@ -612,63 +612,71 @@ const EXAMPLE_FLOPS: Record<'wet' | 'dry', Card[]> = {
   ],
 };
 
-function GtoCard({ rank, suit, faceDown = false, small = false }: {
-  rank?: string; suit?: string; faceDown?: boolean; small?: boolean;
-}) {
-  const w = small ? 32 : 42;
-  const h = small ? 44 : 56;
-  const fontSize = small ? 14 : 20;
+// Clockwise angle from 12 o'clock → (x, y) on the oval
+// Container: 520 × 304, center (260, 152), ra=185, rb=114
+function seatPos(angleDeg: number) {
+  const rad = angleDeg * Math.PI / 180;
+  return { x: 260 + 185 * Math.sin(rad), y: 152 - 114 * Math.cos(rad) };
+}
 
+const GHOST_SEATS: { label: string; angle: number }[] = [
+  { label: 'UTG1', angle: 60  },
+  { label: 'CO',   angle: 120 },
+  { label: 'SB',   angle: 240 },
+  { label: 'UTG',  angle: 300 },
+];
+
+function GtoCard({ rank, suit, faceDown = false }: {
+  rank?: string; suit?: string; faceDown?: boolean;
+}) {
   if (faceDown) {
     return (
       <div style={{
-        width: w, height: h,
-        borderRadius: 5,
-        background: 'linear-gradient(135deg, #1e3a5f 0%, #1e3a8a 100%)',
+        width: 38, height: 52, borderRadius: 5, flexShrink: 0,
+        background: 'linear-gradient(135deg, #1e3a5f, #1e3a8a)',
         border: '1px solid rgba(255,255,255,0.08)',
         boxShadow: '0 2px 6px rgba(0,0,0,0.5)',
       }} />
     );
   }
-
   const bg = suit ? SUIT_BG[suit] ?? '#374151' : '#374151';
   return (
     <div style={{
-      width: w, height: h,
-      borderRadius: 5,
-      background: bg,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      width: 38, height: 52, borderRadius: 5, flexShrink: 0,
+      background: bg, boxShadow: '0 2px 8px rgba(0,0,0,0.6)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <span style={{ color: '#fff', fontWeight: 900, fontSize, lineHeight: 1 }}>{rank}</span>
+      <span style={{ color: '#fff', fontWeight: 900, fontSize: 19, lineHeight: 1 }}>{rank}</span>
     </div>
   );
 }
 
-function SeatBadge({ label, stack, active, color }: {
-  label: string; stack: number; active?: boolean; color?: 'teal' | 'orange';
-}) {
-  const borderColor = active
-    ? color === 'orange' ? '#f97316' : '#14b8a6'
-    : 'rgba(255,255,255,0.12)';
-  const bg = active
-    ? color === 'orange' ? 'rgba(249,115,22,0.15)' : 'rgba(20,184,166,0.15)'
-    : 'rgba(255,255,255,0.04)';
-
+function GhostSeat({ label }: { label: string }) {
   return (
     <div style={{
-      width: 52, height: 52,
-      borderRadius: '50%',
-      border: `2px solid ${borderColor}`,
-      background: bg,
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      boxShadow: active ? `0 0 12px ${borderColor}60` : 'none',
+      width: 48, height: 48, borderRadius: '50%',
+      border: '1.5px solid rgba(255,255,255,0.08)',
+      background: 'rgba(255,255,255,0.02)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <span style={{ color: '#fff', fontWeight: 700, fontSize: 11, lineHeight: 1 }}>{label}</span>
-      <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, lineHeight: 1.4 }}>{stack}</span>
+      <span style={{ color: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 11 }}>{label}</span>
+    </div>
+  );
+}
+
+function ActiveSeat({ label, active, color }: {
+  label: string; active: boolean; color: 'teal' | 'orange';
+}) {
+  const accent = color === 'orange' ? '#f97316' : '#14b8a6';
+  return (
+    <div style={{
+      width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+      border: `2px solid ${active ? accent : 'rgba(255,255,255,0.14)'}`,
+      background: active ? `${accent}18` : 'rgba(255,255,255,0.04)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: active ? `0 0 14px ${accent}40` : 'none',
+    }}>
+      <span style={{ color: active ? '#fff' : 'rgba(255,255,255,0.35)', fontWeight: 700, fontSize: 12 }}>{label}</span>
     </div>
   );
 }
@@ -680,7 +688,7 @@ function TableView({ filters, setFilters }: {
   const flop = filters.board ? EXAMPLE_FLOPS[filters.board] : null;
 
   // heads-up: BTN = IP (acts last postflop), BB = OOP
-  const heroLabel    = filters.position === 'ip' ? 'BTN' : filters.position === 'oop' ? 'BB' : 'Hero';
+  const heroLabel    = filters.position === 'ip' ? 'BTN' : filters.position === 'oop' ? 'BB'  : 'Hero';
   const villainLabel = filters.position === 'ip' ? 'BB'  : filters.position === 'oop' ? 'BTN' : 'Villain';
 
   function toggle<K extends keyof Filters>(key: K, value: Filters[K]) {
@@ -693,67 +701,79 @@ function TableView({ filters, setFilters }: {
   }
 
   return (
-    <div className="rounded-xl border border-white/5 mb-10" style={{ background: '#0a0f1a' }}>
+    <div className="rounded-xl border border-white/5 mb-10 overflow-hidden" style={{ background: '#080d15' }}>
 
       {/* ── Table ── */}
-      <div className="relative mx-auto" style={{ width: 520, height: 300, maxWidth: '100%' }}>
+      <div className="relative mx-auto" style={{ width: 520, height: 304, maxWidth: '100%' }}>
 
-        {/* Oval outline */}
-        <div className="absolute inset-8" style={{
+        {/* Oval */}
+        <div className="absolute" style={{
+          inset: '38px 75px',
           borderRadius: '50%',
-          border: '1.5px solid rgba(255,255,255,0.1)',
-          background: 'rgba(255,255,255,0.015)',
+          border: '1.5px solid rgba(255,255,255,0.07)',
+          background: 'rgba(255,255,255,0.01)',
         }} />
 
-        {/* Villain row */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
-          <SeatBadge label={villainLabel} stack={50} color="orange" />
-          <div className="flex gap-1.5">
-            <GtoCard faceDown />
-            <GtoCard faceDown />
-          </div>
+        {/* Ghost seats */}
+        {GHOST_SEATS.map(({ label, angle }) => {
+          const { x, y } = seatPos(angle);
+          return (
+            <div key={label} style={{ position: 'absolute', left: x - 24, top: y - 24, zIndex: 10 }}>
+              <GhostSeat label={label} />
+            </div>
+          );
+        })}
+
+        {/* Villain (top) */}
+        <div style={{
+          position: 'absolute', top: 12, left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex', alignItems: 'center', gap: 6, zIndex: 10,
+        }}>
+          <ActiveSeat label={villainLabel} active={!!filters.position} color="orange" />
+          <GtoCard faceDown />
+          <GtoCard faceDown />
         </div>
 
         {/* Pot + flop */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-10">
-          <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 600 }}>9.2 bb</span>
-          <div className="flex gap-2">
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, zIndex: 10,
+        }}>
+          <span style={{ color: 'rgba(255,255,255,0.28)', fontSize: 11, fontWeight: 600 }}>9.2 bb</span>
+          <div style={{ display: 'flex', gap: 8 }}>
             {flop ? flop.map((c, i) => (
               <GtoCard key={i} rank={c.rank} suit={c.suit} />
             )) : (
               [0,1,2].map(i => (
-                <div key={i} style={{
-                  width: 42, height: 56, borderRadius: 5,
-                  border: '1.5px dashed rgba(255,255,255,0.1)',
-                }} />
+                <div key={i} style={{ width: 38, height: 52, borderRadius: 5, border: '1.5px dashed rgba(255,255,255,0.07)' }} />
               ))
             )}
           </div>
         </div>
 
-        {/* Dealer button */}
-        <div className="absolute z-10" style={{
-          bottom: '32%', right: '28%',
-          width: 24, height: 24, borderRadius: '50%',
-          background: '#fff', border: '2px solid #64748b',
+        {/* Dealer button — right edge of oval */}
+        <div style={{
+          position: 'absolute', top: '50%', right: 78,
+          transform: 'translateY(-50%)',
+          width: 22, height: 22, borderRadius: '50%',
+          background: '#fff', border: '2px solid #475569',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.5)',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.5)', zIndex: 10,
         }}>
-          <span style={{ fontSize: 9, fontWeight: 900, color: '#0f172a' }}>D</span>
+          <span style={{ fontSize: 8, fontWeight: 900, color: '#0f172a' }}>D</span>
         </div>
 
-        {/* Hero row */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
-          <div className="flex gap-1.5">
-            <GtoCard faceDown />
-            <GtoCard faceDown />
-          </div>
-          <SeatBadge
-            label={heroLabel}
-            stack={50}
-            active={!!filters.position}
-            color="teal"
-          />
+        {/* Hero (bottom) */}
+        <div style={{
+          position: 'absolute', bottom: 12, left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex', alignItems: 'center', gap: 6, zIndex: 10,
+        }}>
+          <GtoCard faceDown />
+          <GtoCard faceDown />
+          <ActiveSeat label={heroLabel} active={!!filters.position} color="teal" />
         </div>
       </div>
 
